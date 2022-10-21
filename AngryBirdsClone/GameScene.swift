@@ -169,7 +169,7 @@ class GameScene: SKScene {
                                 let impulse = CGVector(dx: dx, dy: dy)
                                 bird.physicsBody?.applyImpulse(impulse)
                                 bird.physicsBody?.affectedByGravity = true
-                                gameStarted = false
+                                gameStarted = true
                             }
                         }
                     }
@@ -183,6 +183,17 @@ class GameScene: SKScene {
     }
     
     override func update(_ currentTime: TimeInterval) {
-        // Called before each frame is rendered
+        if let birdPhysics = bird.physicsBody {
+            if birdPhysics.velocity.dx <= 0.2 && birdPhysics.velocity.dy <= 0.2 && birdPhysics.angularVelocity <= 0.2 && gameStarted == true {
+                
+                bird.physicsBody?.affectedByGravity = false
+                bird.physicsBody?.angularVelocity = 0
+                bird.zPosition = 1
+                bird.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
+                bird.position = originalPosition!
+                bird.zRotation = CGFloat(0)
+                gameStarted = false
+            }
+        }
     }
 }
