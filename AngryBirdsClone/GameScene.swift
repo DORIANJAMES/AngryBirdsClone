@@ -25,6 +25,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         case Box = 2
     }
     
+    var score = 0
+    let scoreLabel = SKLabelNode()
+    
     override func didMove(to view: SKView) {
         /*
         let texture = SKTexture(imageNamed: "bird")
@@ -42,6 +45,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         
         
+        
+        
         // Bird
         // GameScene içerisinde oluşuturulan yani kod ile oluşturulmayan spritelar için bu tanımlama şarttır. Fonksiyonun dışarısında tanımladığımız bird değişkenine bir fonksiyon ile birlikte stprite ataması yapıyoruz. Bunu "childNode" fonksiyonu ile yapıyoruz. bizden "withName" isimli bir parametre istiyor. Bu parametre GameScene içerisinde eklediğimiz spritelara verdiğimiz isim. Ardından childNode fonksiyonunu SKSpriteNode olarak cast ediyoruz.
         bird = childNode(withName: "bird") as! SKSpriteNode
@@ -53,7 +58,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         bird.physicsBody?.mass = 0.15
         originalPosition = bird.position
         bird.physicsBody?.contactTestBitMask = ContactType.Bird.rawValue
-        bird.physicsBody?.collisionBitMask = ContactType.Bird.rawValue
+        bird.physicsBody?.collisionBitMask = ContactType.Box.rawValue
         bird.physicsBody?.categoryBitMask = ContactType.Bird.rawValue
         // Bird finish
         
@@ -106,10 +111,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         box5.physicsBody?.allowsRotation = true
         box5.physicsBody?.mass = boxMass
         box5.physicsBody?.collisionBitMask = ContactType.Bird.rawValue
+        
+        
+        // Label
+        scoreLabel.fontName = "Helvetica"
+        scoreLabel.fontSize = 60
+        scoreLabel.text = "0"
+        scoreLabel.position = CGPoint(x: 0, y: self.frame.height / 4)
+        scoreLabel.zPosition = 2
+        //scoreLabel.fontColor = UIColor(named: "black")
+        self.addChild(scoreLabel)
     }
     func didBegin(_ contact: SKPhysicsContact) {
         if contact.bodyA.collisionBitMask == ContactType.Bird.rawValue || contact.bodyB.collisionBitMask == ContactType.Bird.rawValue {
-            print("Contacted")
+            score += 1
+            scoreLabel.text = String(score)
         }
     }
     
@@ -205,6 +221,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 bird.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
                 bird.position = originalPosition!
                 bird.zRotation = CGFloat(0)
+                score = 0
+                scoreLabel.text = String(score)
                 gameStarted = false
             }
         }
