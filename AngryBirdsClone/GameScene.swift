@@ -8,7 +8,7 @@
 import SpriteKit
 import GameplayKit
 
-class GameScene: SKScene {
+class GameScene: SKScene, SKPhysicsContactDelegate {
     
     // var bird2 = SKSpriteNode()
     var bird = SKSpriteNode()
@@ -20,6 +20,10 @@ class GameScene: SKScene {
     
     var gameStarted = false
     var originalPosition : CGPoint?
+    enum ContactType: UInt32 {
+        case Bird = 1
+        case Box = 2
+    }
     
     override func didMove(to view: SKView) {
         /*
@@ -34,6 +38,7 @@ class GameScene: SKScene {
         // Fiziksel vücudun sınır döngüsünün nereden itibaren olacağını belirtiyor. Yani bir objeye fizik verdiğimizde o fizik özelliklerinin nereden sonra çalışmasını istemiyorsak orayı belirtiyoruz. Aşağıdaki senaryoda Frame'in yani telefonun ekran çerçevesinin kendisini belirtmektedir.
         self.physicsBody = SKPhysicsBody(edgeLoopFrom: frame)
         self.scene?.scaleMode = .fill
+        self.physicsWorld.contactDelegate = self
         
         
         
@@ -47,6 +52,9 @@ class GameScene: SKScene {
         bird.physicsBody?.isDynamic = true
         bird.physicsBody?.mass = 0.15
         originalPosition = bird.position
+        bird.physicsBody?.contactTestBitMask = ContactType.Bird.rawValue
+        bird.physicsBody?.collisionBitMask = ContactType.Bird.rawValue
+        bird.physicsBody?.categoryBitMask = ContactType.Bird.rawValue
         // Bird finish
         
         
@@ -68,35 +76,41 @@ class GameScene: SKScene {
         box1.physicsBody?.isDynamic = true
         box1.physicsBody?.allowsRotation = true
         box1.physicsBody?.mass = boxMass
+        box1.physicsBody?.collisionBitMask = ContactType.Bird.rawValue
         
         
         box2.physicsBody = SKPhysicsBody(rectangleOf: size)
         box2.physicsBody?.affectedByGravity = true
         box2.physicsBody?.isDynamic = true
         box2.physicsBody?.allowsRotation = true
-        box3.physicsBody?.mass = boxMass
-        
+        box2.physicsBody?.mass = boxMass
+        box2.physicsBody?.collisionBitMask = ContactType.Bird.rawValue
         
         box3.physicsBody = SKPhysicsBody(rectangleOf: size)
         box3.physicsBody?.affectedByGravity = true
         box3.physicsBody?.isDynamic = true
         box3.physicsBody?.allowsRotation = true
         box3.physicsBody?.mass = boxMass
-        
+        box3.physicsBody?.collisionBitMask = ContactType.Bird.rawValue
         
         box4.physicsBody = SKPhysicsBody(rectangleOf: size)
         box4.physicsBody?.affectedByGravity = true
         box4.physicsBody?.isDynamic = true
         box4.physicsBody?.allowsRotation = true
         box4.physicsBody?.mass = boxMass
-        
+        box4.physicsBody?.collisionBitMask = ContactType.Bird.rawValue
         
         box5.physicsBody = SKPhysicsBody(rectangleOf: size)
         box5.physicsBody?.affectedByGravity = true
         box5.physicsBody?.isDynamic = true
         box5.physicsBody?.allowsRotation = true
         box5.physicsBody?.mass = boxMass
-        
+        box5.physicsBody?.collisionBitMask = ContactType.Bird.rawValue
+    }
+    func didBegin(_ contact: SKPhysicsContact) {
+        if contact.bodyA.collisionBitMask == ContactType.Bird.rawValue || contact.bodyB.collisionBitMask == ContactType.Bird.rawValue {
+            print("Contacted")
+        }
     }
     
     func touchDown(atPoint pos : CGPoint) {
@@ -185,7 +199,6 @@ class GameScene: SKScene {
     override func update(_ currentTime: TimeInterval) {
         if let birdPhysics = bird.physicsBody {
             if birdPhysics.velocity.dx <= 0.2 && birdPhysics.velocity.dy <= 0.2 && birdPhysics.angularVelocity <= 0.2 && gameStarted == true {
-                
                 bird.physicsBody?.affectedByGravity = false
                 bird.physicsBody?.angularVelocity = 0
                 bird.zPosition = 1
